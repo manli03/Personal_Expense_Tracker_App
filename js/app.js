@@ -1,39 +1,27 @@
+// app.js
 $(document).ready(function() {
-    const loginContainer = $('#login-container');
     const appContainer = $('#app-container');
-    const loginForm = $('#login-form');
     const expenseForm = $('#expense-form');
     const expenseList = $('#expense-list');
     const totalExpenses = $('#total-expenses');
     const ctx = document.getElementById('expenseChart').getContext('2d');
+    // Declare myChart as a global variable
+    let myChart;
 
     // Check if user is logged in
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (isLoggedIn) {
-        loginContainer.hide();
+    let isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn'));
+    if (!isLoggedIn) {
+        window.location.href = 'index.html';
+    } else {
         appContainer.removeClass('d-none');
     }
 
-    loginForm.on('submit', function(e) {
-        e.preventDefault();
-        const username = $('#username').val();
-        const password = $('#password').val();
+    const username = isLoggedIn.username;
 
-        console.log('Login form submitted');
-        console.log('Username:', username, 'Password:', password);
-
-        // Simple validation
-        if (username === 'user' && password === 'pass') {
-            localStorage.setItem('isLoggedIn', true);
-            loginContainer.hide();
-            appContainer.removeClass('d-none');
-        } else {
-            alert('Invalid credentials');
-        }
-    });
-
-    // Load expenses from Local Storage
-    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    // Load user expenses from Local Storage
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    let user = users.find(u => u.username === username);
+    let expenses = user.expenses || [];
 
     // Display expenses on load
     displayExpenses();
@@ -47,7 +35,10 @@ $(document).ready(function() {
 
         const expense = { amount, date, description };
         expenses.push(expense);
-        localStorage.setItem('expenses', JSON.stringify(expenses));
+
+        // Update user expenses in Local Storage
+        user.expenses = expenses;
+        localStorage.setItem('users', JSON.stringify(users));
         displayExpenses();
         expenseForm.trigger('reset');
     });
@@ -56,6 +47,10 @@ $(document).ready(function() {
     function displayExpenses() {
         expenseList.empty();
         let total = 0;
+
+        // Sort expenses by date
+        expenses.sort((a, b) => new Date(a.date) - new Date(b.date));
+
         expenses.forEach((expense, index) => {
             total += parseFloat(expense.amount);
             expenseList.append(`
@@ -78,7 +73,10 @@ $(document).ready(function() {
     expenseList.on('click', '.delete-btn', function() {
         const index = $(this).data('index');
         expenses.splice(index, 1);
-        localStorage.setItem('expenses', JSON.stringify(expenses));
+
+        // Update user expenses in Local Storage
+        user.expenses = expenses;
+        localStorage.setItem('users', JSON.stringify(users));
         displayExpenses();
     });
 
@@ -90,7 +88,10 @@ $(document).ready(function() {
         $('#date').val(expense.date);
         $('#description').val(expense.description);
         expenses.splice(index, 1);
-        localStorage.setItem('expenses', JSON.stringify(expenses));
+
+        // Update user expenses in Local Storage
+        user.expenses = expenses;
+        localStorage.setItem('users', JSON.stringify(users));
         displayExpenses();
     });
 
@@ -98,26 +99,46 @@ $(document).ready(function() {
     function displayChart() {
         const dates = expenses.map(expense => expense.date);
         const amounts = expenses.map(expense => parseFloat(expense.amount));
-
-        new Chart(ctx, {
+      
+        if (!myChart) {
+          myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: dates,
-                datasets: [{
-                    label: 'Expenses',
-                    data: amounts,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
+              labels: dates,
+              datasets: [{
+                label: 'Expenses',
+                data: amounts,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+              }]
             },
             options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+              scales: {
+                y: {
+                  beginAtZero: true
                 }
+              }
             }
-        });
-    }
+          });
+        } else {
+          myChart.data.labels = dates;
+          myChart.data.datasets[0].data = amounts;
+          myChart.update();
+        }
+      }
+
+    // Logout functionality
+    $('#logoutBtn').on('click', function() {
+        isLoggedIn = false; // Set isLoggedIn to false
+        localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn));
+        window.location.href = 'index.html'; // Redirect to the login page
+    });
+
+    // Clear local storage when a button with id "clearStorageBtn" is clicked
+    $('#clearStorageBtn').on('click', function() {
+        localStorage.clear();
+        // Optionally, you can also redirect the user to a specific page after clearing the storage
+        // window.location.href = 'index.html';
+    });
 });
