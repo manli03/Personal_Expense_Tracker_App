@@ -4,19 +4,27 @@ $(document).ready(function() {
     const messageContainer = $('#message');
     const successPopup = $('#successPopup');
 
+    const defaultUsers = [
+        { username: 'admin', password: 'secure_password' }, // Default user
+    ];
+
     loginForm.on('submit', function(e) {
         e.preventDefault();
         const username = $('#username').val();
         const password = $('#password').val();
 
         // Retrieve users from localStorage
-        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const users = JSON.parse(localStorage.getItem('users')) || defaultUsers; // Use default if no users exist
 
         const user = users.find(u => u.username === username && u.password === password);
+        const userNotExist = users.find(u => u.password !== password)
 
         if (user) {
             localStorage.setItem('isLoggedIn', JSON.stringify({ username }));
             successPopup.show();
+        } else if (userNotExist) {
+            showMessage('User not exist. Please sign up first.', 'error');
+            return;
         } else {
             showMessage('Invalid credentials. Please try again.', 'error');
         }
@@ -31,7 +39,7 @@ $(document).ready(function() {
         messageContainer.removeClass('success error').addClass(type).text(message).slideDown();
         setTimeout(() => {
             messageContainer.slideUp();
-        }, 3000);
+        }, 5000);
     }
 
     // Check if user is already logged in

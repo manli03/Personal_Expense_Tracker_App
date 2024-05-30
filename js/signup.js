@@ -30,6 +30,9 @@ $(document).ready(function() {
 
     function showMessage(message, type) {
         messageContainer.removeClass('success error').addClass(type).text(message).slideDown();
+        setTimeout(() => {
+            messageContainer.slideUp();
+        }, 5000);
     }
 
     // Handle OK button click in the signup success popup

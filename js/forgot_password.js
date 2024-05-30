@@ -1,6 +1,6 @@
 $(document).ready(function() {
     const forgotPasswordForm = $('#forgot-password-form');
-    const message = $('#message');
+    const messageContainer = $('#message');
     const successPopup = $('#successPopup');
 
     // Hide the success popup upon loading the page
@@ -27,7 +27,7 @@ $(document).ready(function() {
         let user = users.find(u => u.username === username);
 
         if (!user) {
-            showMessage('User not found.', 'error');
+            showMessage('User not found. Please try again.', 'error');
             return;
         }
 
@@ -51,8 +51,11 @@ $(document).ready(function() {
     });
 
     // Function to display messages
-    function showMessage(messageText, className) {
-        message.removeClass().addClass('text-center').addClass(className).text(messageText);
+    function showMessage(message, type) {
+        messageContainer.removeClass('success error').addClass(type).text(message).slideDown();
+        setTimeout(() => {
+            messageContainer.slideUp();
+        }, 5000);
     }
 
     // Handle OK button click in the success popup
