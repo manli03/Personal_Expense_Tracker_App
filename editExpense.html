@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Expense</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Edit Expense</h1>
+        <div class="card">
+            <div class="card-body">
+                <form id="edit-expense-form">
+                    <div class="form-group">
+                        <label for="edit-amount">Amount</label>
+                        <input type="number" id="edit-amount" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-date">Date</label>
+                        <input type="date" id="edit-date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-category">Category</label>
+                        <select id="edit-category" class="form-control" required>
+                            <!-- Categories will be dynamically added here -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-description">Description</label>
+                        <input type="text" id="edit-description" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Update Expense</button>
+                    <button id="deleteExpenseBtn" class="btn btn-danger btn-block mt-2">Delete Expense</button>
+                </form>
+            </div>
+        </div>
+        <button id="backBtn" class="btn btn-secondary btn-block mt-3">Back</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="js/editExpense.js"></script>
+</body>
+</html>

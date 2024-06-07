@@ -1,5 +1,6 @@
 body {
     background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
 }
 
 .card {
@@ -8,6 +9,20 @@ body {
 
 .table th, .table td {
     text-align: center;
+}
+
+/* Title Styling */
+#app-container h1 {
+    font-size: 2.4rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1.5rem; /* Added more space below the title */
+    letter-spacing: 1px;
+}
+
+#app-container h1 span {
+    color: #007bff; /* Highlight color for part of the title */
 }
 
 /* Make forms and buttons fill the screen width on small devices */
@@ -41,8 +56,7 @@ body {
     align-items: center;
 }
 
-/* Styling for the login success popup */
-#successPopup {
+#successPopup, #signupSuccessPopup {
     background-color: #e9f5ea; /* Light green background */
     padding: 20px;
     border-radius: 10px;
@@ -53,47 +67,179 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+#successPopup h2, #signupSuccessPopup h2 {
+    margin-bottom: 20px;
+}
+
+#successPopup #okButton, #signupSuccessPopup #okButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #successPopup h2 {
     color: #28a745; /* Green color for success heading */
-    margin-bottom: 20px;
 }
-
-#successPopup #okButton {
-    padding: 10px 20px;
-    background-color: #28a745; /* Green color for button background */
-    color: #fff; /* White color for button text */
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-/* Styling for the signup success popup */
-#signupSuccessPopup {
-    background-color: #e9f5ea; /* Light green background */
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    max-width: 80%; /* Limit the width of the popup */
-    max-height: 40%;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
 
 #signupSuccessPopup h2 {
     color: #007bff; /* Blue color for success heading */
-    margin-bottom: 20px;
+}
+
+#successPopup #okButton {
+    background-color: #28a745; /* Green color for button background */
+    color: #fff; /* White color for button text */
 }
 
 #signupSuccessPopup #okButton {
-    padding: 10px 20px;
     background-color: #007bff; /* Blue color for button background */
     color: #fff; /* White color for button text */
+}
+
+/* New styles for the expense tracker update */
+.month-navigation {
+    overflow: hidden;
+}
+
+#monthsContainer {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px 0; /* Add padding for the month navigation */
+}
+
+.month-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    margin: 0 8px; /* Adjust spacing between month elements */
+    background: none;
     border: none;
+    color: #6c757d;
+    font-weight: bold;
+    position: relative;
+}
+
+.month-btn span {
+    display: inline-block;
+    text-align: center;
+}
+
+.month-btn.active {
+    color: #000;
+}
+
+.month-btn.active::after {
+    content: "";
+    display: block;
+    margin: 0 auto;
+    height: 2px;
+    width: 100%; /* Make underline same width as the text */
+    background: #000;
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    right: 0;
+}
+
+.month-btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+#pieChartContainer {
+    position: relative;
+    margin: 0 auto;
+    width: 300px;
+    height: 300px;
+    margin-bottom: 50px; /* Add margin bottom to create space */
+}
+
+#totalExpenses {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.2rem;
+    text-align: center;
+    line-height: 1.5;
+    font-weight: normal; /* Remove bold */
+}
+
+#totalExpenses span {
+    display: block;
+    font-size: 1.5rem; /* Increase font size */
+    font-weight: bold; /* Make font bold */
+}
+
+.category-list-container {
+    display: flex;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    padding: 10px 0; /* Add padding for the category list */
+    gap: 20px; /* Add gap between category items */
+}
+
+.category-item {
+    flex: 0 0 auto; /* Prevent the flex items from shrinking or growing */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 80px; /* Ensure the items have a minimum width */
+    margin-right: 10px; /* Add margin between category items */
+}
+
+.category-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 1.2rem; /* Smaller icon size */
+    margin-bottom: 5px; /* Space between icon and text */
+}
+
+.category-name {
+    font-size: 0.8rem; /* Smaller font size */
+}
+
+.category-amount {
+    color: #e74c3c; /* Red color for amount */
+    font-size: 0.7rem; /* Smaller font size to prevent overflow */
+}
+
+.table-responsive {
+    overflow-x: auto; /* Enable horizontal scrolling */
+}
+
+#logoutBtn {
+    background-color: #dc3545;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
+    margin: 10px 0;
+    width: 100px; /* Add width to ensure alignment */
+}
+
+.d-flex.justify-content-start {
+    justify-content: flex-start !important; /* Aligns items to the start */
+}
+
+#logoutBtn:hover {
+    background-color: #c82333;
+}
+
+
+@media (max-width: 576px) {
+    .form-control, .btn {
+        width: 100%;
+    }
 }
