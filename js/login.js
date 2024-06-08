@@ -17,7 +17,7 @@ $(document).ready(function() {
         const users = JSON.parse(localStorage.getItem('users')) || defaultUsers; // Use default if no users exist
 
         const user = users.find(u => u.username === username && u.password === password);
-        const userNotExist = users.find(u => u.password !== password)
+        const userNotExist = users.find(u => u.username !== username)
 
         if (user) {
             localStorage.setItem('isLoggedIn', JSON.stringify({ username }));
