@@ -12,23 +12,24 @@ $(document).ready(function() {
         e.preventDefault();
         const username = $('#username').val();
         const password = $('#password').val();
-
+    
         // Retrieve users from localStorage
         const users = JSON.parse(localStorage.getItem('users')) || defaultUsers; // Use default if no users exist
-
-        const user = users.find(u => u.username === username && u.password === password);
-        const userNotExist = users.find(u => u.username !== username)
-
+    
+        const user = users.find(u => u.username === username);
+        
         if (user) {
-            localStorage.setItem('isLoggedIn', JSON.stringify({ username }));
-            successPopup.show();
-        } else if (userNotExist) {
-            showMessage('User not exist. Please sign up first.', 'error');
-            return;
+            if (user.password === password) {
+                localStorage.setItem('isLoggedIn', JSON.stringify({ username }));
+                successPopup.show();
+            } else {
+                showMessage('Invalid credentials. Please try again.', 'error');
+            }
         } else {
-            showMessage('Invalid credentials. Please try again.', 'error');
+            showMessage('User not exist. Please sign up first.', 'error');
         }
     });
+    
 
     $('#okButton').on('click', function() {
         window.location.href = 'app.html';
