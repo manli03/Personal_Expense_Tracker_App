@@ -174,7 +174,6 @@ $(document).ready(function() {
             myChart.destroy();
             myChart = null;
         }
-        pieChartContainer.hide();
     }
   
     // Function to display the pie chart using data from the category list
