@@ -16,15 +16,19 @@ $(document).ready(function() {
     $('#edit-date').attr('max', localDate);
 
     // Load expense data
-    const expenseIndex = localStorage.getItem('editExpenseIndex');
-    const expenseMonth = localStorage.getItem('editExpenseMonth');
+    const expenseId = parseInt(localStorage.getItem('editExpenseId'), 10);
+    const expenseMonth = parseInt(localStorage.getItem('editExpenseMonth'), 10);
+    const expenseYear = parseInt(localStorage.getItem('editExpenseYear'), 10);
     let users = JSON.parse(localStorage.getItem('users')) || [];
     let isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn'));
     const username = isLoggedIn.username;
     let user = users.find(u => u.username === username);
-    let expenses = user.expenses || [];
+    let expenses = user.expenses || {};
+    const monthKey = `${expenseYear}-${expenseMonth}`;
+    let monthExpenses = expenses[monthKey] || [];
 
-    const expense = expenses.find((exp, index) => new Date(exp.date).getMonth() == expenseMonth && index == expenseIndex);
+    // Find the specific expense by id
+    let expense = monthExpenses.find(exp => exp.id === expenseId);
 
     if (expense) {
         $('#edit-amount').val(expense.amount);
@@ -41,21 +45,37 @@ $(document).ready(function() {
         const category = $('#edit-category').val();
         const description = $('#edit-description').val();
 
-        const updatedExpense = { amount, date, category, description };
+        const updatedExpense = {
+            id: expense.id, // Retain the same ID
+            amount,
+            date,
+            category,
+            description
+        };
 
         // Update the expense in the expenses array
-        expenses[expenseIndex] = updatedExpense;
-        user.expenses = expenses;
-        localStorage.setItem('users', JSON.stringify(users));
+        const indexToUpdate = monthExpenses.findIndex(exp => exp.id === expense.id);
+        if (indexToUpdate !== -1) {
+            monthExpenses[indexToUpdate] = updatedExpense;
+            expenses[monthKey] = monthExpenses;
+            user.expenses = expenses;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
 
         window.location.href = 'app.html';
     });
 
     // Delete expense
     $('#deleteExpenseBtn').on('click', function() {
-        expenses.splice(expenseIndex, 1);
-        user.expenses = expenses;
-        localStorage.setItem('users', JSON.stringify(users));
+        const indexToDelete = monthExpenses.findIndex(exp => exp.id === expense.id);
+
+        if (indexToDelete !== -1) {
+            monthExpenses.splice(indexToDelete, 1);
+            expenses[monthKey] = monthExpenses;
+            user.expenses = expenses;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
         window.location.href = 'app.html';
     });
 

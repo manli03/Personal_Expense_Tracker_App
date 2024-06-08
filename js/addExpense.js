@@ -27,10 +27,30 @@ $(document).ready(function() {
         let isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn'));
         const username = isLoggedIn.username;
         let user = users.find(u => u.username === username);
-        let expenses = user.expenses || [];
+        if (!user) {
+            user = { username: username, expenses: {} };
+            users.push(user);
+        }
+        let expenses = user.expenses || {};
 
-        const expense = { amount, date, category, description };
-        expenses.push(expense);
+        // Generate a unique ID for the expense
+        const expense = {
+            id: Date.now(), // Using timestamp as a simple unique ID
+            amount,
+            date,
+            category,
+            description
+        };
+
+        // Determine the key for the current month
+        const expenseDate = new Date(date);
+        const monthKey = `${expenseDate.getFullYear()}-${expenseDate.getMonth()}`;
+
+        if (!expenses[monthKey]) {
+            expenses[monthKey] = [];
+        }
+
+        expenses[monthKey].push(expense);
         user.expenses = expenses;
         localStorage.setItem('users', JSON.stringify(users));
 
