@@ -1,3 +1,5 @@
+## Title: Personal Expense Tracker Mobile App
+
 ## Group Member Info:
 1. Name & Matric Number & Phone Number
      - **Name:** Muhammad Aiman Bin Norazli
@@ -13,15 +15,8 @@
         - **Phone Number:** 017-3214109
    
 
-## Title: Personal Expense Tracker Mobile App
 ## Introduction
 The Personal Expense Tracker App is designed to help users manage and track their daily expenses. The app includes functionalities to add, edit, delete, and view expenses, along with a summary of the expenses. It is developed using HTML, CSS, JavaScript, and jQuery, with an emphasis on a mobile-friendly user interface enhanced by Bootstrap, Font Awesome, and other styling frameworks.
 
 ## Example Interface
-![](resources\welcome_screen.jpg)
-![](resources\output1.jpg)
-![](resources\output2.jpg)
-![](resources\output3.jpg)
-![](resources\output4.jpg)
-![](resources\output5.jpg)
-![](resources\output6.jpg)
+<img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/welcome_screen.jpg" width="200" alt="Output Image"> <img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/output1.jpg" width="200" alt="Output Image"> <img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/output2.jpg" width="200" alt="Output Image"> <img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/output3.jpg" width="200" alt="Output Image"> <img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/output4.jpg" width="200" alt="Output Image"> <img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/output5.jpg" width="200" alt="Output Image"> <img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/output6.jpg" width="200" alt="Output Image"> <img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/output7.jpg" width="200" alt="Output Image"> <img src="https://github.com/manli03/Personal_Expense_Tracker_App/blob/main/resources/output8.jpg" width="200" alt="Output Image">
