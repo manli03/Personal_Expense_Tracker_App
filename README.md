@@ -1,5 +1,7 @@
 ## Title: Personal Expense Tracker Mobile App
 
+## You can download this app by clicking [download](https://github.com/manli03/Personal_Expense_Tracker_App/releases/download/app/personal_expense.apk)
+
 ## Group Member Info:
 1. Name & Matric Number & Phone Number
      - **Name:** Muhammad Aiman Bin Norazli
