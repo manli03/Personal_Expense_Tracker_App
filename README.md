@@ -1,4 +1,5 @@
 ## Title: Personal Expense Tracker Mobile App
+[Try this app online](median.co/share/rxnalk)
 
 ## You can download this app by clicking [download](https://github.com/manli03/Personal_Expense_Tracker_App/releases/download/app/personal_expense.apk)
 
