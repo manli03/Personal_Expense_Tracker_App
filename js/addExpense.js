@@ -50,9 +50,10 @@ $(document).ready(function() {
             expenses[monthKey] = [];
         }
 
+        // Save the new expense to the appropriate month
         expenses[monthKey].push(expense);
-        user.expenses = expenses;
-        localStorage.setItem('users', JSON.stringify(users));
+        user.expenses = expenses; 
+        localStorage.setItem('users', JSON.stringify(users)); // save updated user information
 
         window.location.href = 'app.html';
     });

@@ -58,8 +58,8 @@ $(document).ready(function() {
         if (indexToUpdate !== -1) {
             monthExpenses[indexToUpdate] = updatedExpense;
             expenses[monthKey] = monthExpenses;
-            user.expenses = expenses;
-            localStorage.setItem('users', JSON.stringify(users));
+            user.expenses = expenses; // save new expense inside current user
+            localStorage.setItem('users', JSON.stringify(users)); // save updated users information
         }
 
         window.location.href = 'app.html';
@@ -70,10 +70,10 @@ $(document).ready(function() {
         const indexToDelete = monthExpenses.findIndex(exp => exp.id === expense.id);
 
         if (indexToDelete !== -1) {
-            monthExpenses.splice(indexToDelete, 1);
+            monthExpenses.splice(indexToDelete, 1); // delete specific expense for that month
             expenses[monthKey] = monthExpenses;
-            user.expenses = expenses;
-            localStorage.setItem('users', JSON.stringify(users));
+            user.expenses = expenses; // save new expense inside current user
+            localStorage.setItem('users', JSON.stringify(users)); // save updated users information
         }
 
         window.location.href = 'app.html';
