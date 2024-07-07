@@ -19,7 +19,7 @@
    
 
 ## Introduction
-The Multi-Functional App is designed to help users manage and track their daily expenses. The app includes functionalities to add, edit, delete, and view expenses, along with a summary of the expenses. It is developed using HTML, CSS, JavaScript, and jQuery, with an emphasis on a mobile-friendly user interface enhanced by Bootstrap, Font Awesome, and other styling frameworks.
+The Personal Expense Tracker App is designed to help users manage and track their daily expenses. The app includes functionalities to add, edit, delete, and view expenses, along with a summary of the expenses. It is developed using HTML, CSS, JavaScript, and jQuery, with an emphasis on a mobile-friendly user interface enhanced by Bootstrap, Font Awesome, and other styling frameworks.
 
 ## Youtube Presentation
 [Link for Youtube Presentation](https://youtu.be/3bzEMKIVHD8)
