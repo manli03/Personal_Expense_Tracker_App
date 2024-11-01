@@ -151,6 +151,11 @@ $(document).ready(function () {
         const currentIncome = expenses[monthKey]?.income;
         console.log(currentIncome);
 
+        // Show the overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-overlay';
+        document.body.appendChild(overlay);
+
         Swal.fire({
             title: 'Update Income',
             input: 'number',
@@ -178,6 +183,8 @@ $(document).ready(function () {
 
                 location.reload();
             }
+            // Remove the overlay when the modal is closed
+            document.body.removeChild(overlay);
         });
     });
 

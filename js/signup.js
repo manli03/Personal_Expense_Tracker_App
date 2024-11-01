@@ -3,10 +3,6 @@
 $(document).ready(function() {
     const signupForm = $('#signup-form');
     const messageContainer = $('#message');
-    const signupSuccessPopup = $('#signupSuccessPopup');
-
-    // Clear the signup success state upon loading the signup page
-    signupSuccessPopup.hide();
 
     signupForm.on('submit', function(e) {
         e.preventDefault();
@@ -26,7 +22,7 @@ $(document).ready(function() {
         } else {
             users.push({ username, password, securityQuestion, securityAnswer }); // Store security question and answer along with username and password
             localStorage.setItem('users', JSON.stringify(users));
-            signupSuccessPopup.show();
+            showSuccessPopup(); // Show success popup
         }
     });
 
@@ -37,11 +33,16 @@ $(document).ready(function() {
         }, 5000);
     }
 
-    // Handle OK button click in the signup success popup
-    signupSuccessPopup.find('#okButton').on('click', function() {
-        // Hide the popup
-        signupSuccessPopup.hide();
-        // Redirect to the login page
-        window.location.href = 'index.html';
-    });
+    function showSuccessPopup() {
+        Swal.fire({
+            title: 'Success!',
+            text: 'Your account has been created successfully!',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#4CAF50'
+        }).then(() => {
+            // Redirect to the login page after clicking OK
+            window.location.href = 'index.html';
+        });
+    }
 });

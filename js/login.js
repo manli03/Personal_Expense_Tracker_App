@@ -2,7 +2,6 @@
 $(document).ready(function() {
     const loginForm = $('#login-form');
     const messageContainer = $('#message');
-    const successPopup = $('#successPopup');
 
     const defaultUsers = [
         { username: 'admin', password: 'secure_password' }, // Default user
@@ -21,7 +20,7 @@ $(document).ready(function() {
         if (user) {
             if (user.password === password) {
                 localStorage.setItem('isLoggedIn', JSON.stringify({ username }));
-                successPopup.show();
+                showSuccessPopup(); // Show success popup
             } else {
                 showMessage('Invalid credentials. Please try again.', 'error');
             }
@@ -29,12 +28,19 @@ $(document).ready(function() {
             showMessage('User not exist. Please sign up first.', 'error');
         }
     });
-    
 
-    $('#okButton').on('click', function() {
-        window.location.href = 'app.html';
-        successPopup.hide();
-    });
+    function showSuccessPopup() {
+        Swal.fire({
+            title: 'Success!',
+            text: 'You have successfully logged in!',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#4CAF50'
+        }).then(() => {
+            // Redirect to the app page after clicking OK
+            window.location.href = 'app.html';
+        });
+    }
 
     function showMessage(message, type) {
         messageContainer.removeClass('success error').addClass(type).text(message).slideDown();
@@ -47,8 +53,5 @@ $(document).ready(function() {
     const isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn'));
     if (isLoggedIn) {
         window.location.href = 'app.html';
-    } else {
-        // Hide success popup if the user is not logged in
-        successPopup.hide();
     }
 });
