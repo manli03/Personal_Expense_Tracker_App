@@ -148,17 +148,20 @@ $(document).ready(function () {
             expenses[monthKey] = { income: 0, expenses: [] }; // Initialize with income and expenses
         }
 
-        const currentIncome = expenses[monthKey].income || 0;
+        const currentIncome = expenses[monthKey]?.income;
+        console.log(currentIncome);
 
         Swal.fire({
             title: 'Update Income',
             input: 'number',
             inputLabel: 'Enter income amount',
-            inputValue: currentIncome,
+            inputValue: currentIncome || '', // Set to empty if currentIncome is 0
+            inputPlaceholder: currentIncome === 0 ? 'Enter your income' : '', // Placeholder when currentIncome is 0
             showCancelButton: true,
             confirmButtonText: 'Save',
             confirmButtonColor: '#4CAF50',
             cancelButtonColor: '#6c757d',
+            backdrop: false, // Disable background dismiss
             inputValidator: (value) => {
                 if (!value) return 'Please enter an amount!';
                 if (value < 0) return 'Amount cannot be negative!';
@@ -190,13 +193,16 @@ $(document).ready(function () {
         let categoryTotals = {};
 
         // Reset Money In and Balance
-        $('#moneyIn').text('RM 0.00');
-        $('#balance').text('RM 0.00');
+        const income = monthData.income !== undefined ? monthData.income : 0; // Load income value
+        $('#moneyIn').text(`RM ${income.toFixed(2)}`);
+        $('#balance').text('RM 0.00'); // Reset balance to 0 initially
         $('#balance').css('color', '#17a2b8'); // Reset color
         $('.balance').css('color', '#17a2b8'); // Positive balance
 
-
         if (monthExpenses.length === 0) {
+            // Calculate balance even if there are no expenses
+            const balance = income;
+            $('#balance').text(`RM ${balance.toFixed(2)}`);
             totalAmount.html(`<span>RM 0.00</span>`);
             resetCategoriesToZero();
             hideChart();
@@ -210,23 +216,21 @@ $(document).ready(function () {
             categoryTotals[expense.category] += parseFloat(expense.amount);
             totalOut += parseFloat(expense.amount);
             expenseList.append(`
-            <tr>
-                <td>${expense.date}</td>
-                <td>${expense.category}</td>
-                <td>${expense.amount}</td>
-                <td>${expense.description}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm edit-btn" data-id="${expense.id}" data-month="${currentMonth}" data-year="${currentYear}">Edit</button>
-                </td>
-            </tr>
-        `);
+        <tr>
+            <td>${expense.date}</td>
+            <td>${expense.category}</td>
+            <td>${expense.amount}</td>
+            <td>${expense.description}</td>
+            <td>
+                <button class="btn btn-warning btn-sm edit-btn" data-id="${expense.id}" data-month="${currentMonth}" data-year="${currentYear}">Edit</button>
+            </td>
+        </tr>
+    `);
         });
 
         totalAmount.html(`<span>RM ${totalOut.toFixed(2)}</span>`);
 
-        const income = monthData.income || 0; // Load income value
-        $('#moneyIn').text(`RM ${income.toFixed(2)}`);
-
+        // Calculate balance
         const balance = income - totalOut;
         $('#balance').text(`RM ${balance.toFixed(2)}`);
 
@@ -242,6 +246,7 @@ $(document).ready(function () {
         populateCategoriesWithAmounts(categoryTotals);
         displayChartFromCategoryList(categoryTotals, totalOut);
     }
+
 
 
     function hideChart() {
