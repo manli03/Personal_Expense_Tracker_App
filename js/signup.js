@@ -1,3 +1,5 @@
+// signup.js
+
 $(document).ready(function() {
     const signupForm = $('#signup-form');
     const messageContainer = $('#message');

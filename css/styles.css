@@ -243,3 +243,49 @@ body {
         width: 100%;
     }
 }
+
+
+/* General Card Styles */
+.money-card {
+    border: 1px solid #e0e0e0; /* Light gray border for subtle definition */
+    border-radius: 10px; /* Rounded corners */
+    transition: box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+.money-in:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Shadow effect on hover */
+    background-color: #d4edda; /* Soft green background */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+
+/* Money In and Balance Styling */
+.money-in, .balance {
+    font-size: 1.5rem; /* Increased font size for emphasis */
+    font-weight: 600; /* Semi-bold for better readability */
+    text-align: center; /* Center align text */
+    overflow: hidden; /* Hide overflow */
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-overflow: ellipsis; /* Show ellipsis for overflowed text */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    color: #333; /* Dark gray for text for good contrast */
+}
+
+/* Icon Styles */
+.icon {
+    margin-left: 8px; /* Spacing between title and icon */
+    font-size: 1.5rem; /* Increase icon size */
+    color: #007bff; /* Blue color for icons for consistency */
+}
+
+/* Specific Styles for Money In */
+.money-in {
+    color: #28a745; /* Green color for Money In */
+}
+
+/* Specific Styles for Balance */
+.balance {
+    color: #17a2b8; /* Teal color for Balance */
+}

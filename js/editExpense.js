@@ -25,7 +25,8 @@ $(document).ready(function() {
     let user = users.find(u => u.username === username);
     let expenses = user.expenses || {};
     const monthKey = `${expenseYear}-${expenseMonth}`;
-    let monthExpenses = expenses[monthKey] || [];
+    let monthData = expenses[monthKey] || { income: 0, expenses: [] };
+    let monthExpenses = monthData.expenses;
 
     // Find the specific expense by id
     let expense = monthExpenses.find(exp => exp.id === expenseId);
@@ -56,10 +57,11 @@ $(document).ready(function() {
         // Update the expense in the expenses array
         const indexToUpdate = monthExpenses.findIndex(exp => exp.id === expense.id);
         if (indexToUpdate !== -1) {
-            monthExpenses[indexToUpdate] = updatedExpense;
-            expenses[monthKey] = monthExpenses;
-            user.expenses = expenses; // save new expense inside current user
-            localStorage.setItem('users', JSON.stringify(users)); // save updated users information
+            monthExpenses[indexToUpdate] = updatedExpense; // Update the specific expense
+            monthData.expenses = monthExpenses; // Update the expenses array in monthData
+            expenses[monthKey] = monthData; // Save updated monthData
+            user.expenses = expenses; // Update user expenses
+            localStorage.setItem('users', JSON.stringify(users)); // Save updated users information
         }
 
         window.location.href = 'app.html';
@@ -70,10 +72,11 @@ $(document).ready(function() {
         const indexToDelete = monthExpenses.findIndex(exp => exp.id === expense.id);
 
         if (indexToDelete !== -1) {
-            monthExpenses.splice(indexToDelete, 1); // delete specific expense for that month
-            expenses[monthKey] = monthExpenses;
-            user.expenses = expenses; // save new expense inside current user
-            localStorage.setItem('users', JSON.stringify(users)); // save updated users information
+            monthExpenses.splice(indexToDelete, 1); // Delete specific expense for that month
+            monthData.expenses = monthExpenses; // Update the expenses array in monthData
+            expenses[monthKey] = monthData; // Save updated monthData
+            user.expenses = expenses; // Update user expenses
+            localStorage.setItem('users', JSON.stringify(users)); // Save updated users information
         }
 
         window.location.href = 'app.html';

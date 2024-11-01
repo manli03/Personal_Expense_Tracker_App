@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     const appContainer = $('#app-container');
     const expenseList = $('#expense-list');
     const totalAmount = $('#totalAmount');
@@ -80,7 +80,6 @@ $(document).ready(function() {
 
     function populateCategoriesWithAmounts(categoryTotals) {
         categoryListContainer.empty();
-        // Sort categories by amount in descending order
         const sortedCategories = categories.sort((a, b) => (categoryTotals[b.name] || 0) - (categoryTotals[a.name] || 0));
         sortedCategories.forEach(category => {
             const amount = categoryTotals[category.name] || 0;
@@ -114,7 +113,7 @@ $(document).ready(function() {
     }
 
     // Event listeners for month navigation
-    $('#monthsContainer').on('click', '.month-btn', function() {
+    $('#monthsContainer').on('click', '.month-btn', function () {
         $('.month-btn').removeClass('active');
         $(this).addClass('active');
         currentMonth = $(this).data('month');
@@ -123,15 +122,79 @@ $(document).ready(function() {
         displayExpenses();
     });
 
+    $('#moneyInCard').click(function () {
+        const monthKey = `${currentYear}-${currentMonth}`;
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        let isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn'));
+
+        if (!isLoggedIn || !isLoggedIn.username) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Not Logged In',
+                text: 'Please log in to update income.',
+                confirmButtonColor: '#4CAF50'
+            });
+            return;
+        }
+
+        const username = isLoggedIn.username;
+
+        let user = users.find(u => u.username === username);
+        let expenses = user.expenses || {};
+
+        if (!expenses[monthKey]) {
+            expenses[monthKey] = { income: 0, expenses: [] }; // Initialize with income and expenses
+        }
+
+        const currentIncome = expenses[monthKey].income || 0;
+
+        Swal.fire({
+            title: 'Update Income',
+            input: 'number',
+            inputLabel: 'Enter income amount',
+            inputValue: currentIncome,
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+            confirmButtonColor: '#4CAF50',
+            cancelButtonColor: '#6c757d',
+            inputValidator: (value) => {
+                if (!value) return 'Please enter an amount!';
+                if (value < 0) return 'Amount cannot be negative!';
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const incomeAmount = parseFloat(result.value);
+                expenses[monthKey].income = incomeAmount;
+
+                user.expenses = expenses;
+
+                users = users.map(u => u.username === username ? user : u);
+                localStorage.setItem('users', JSON.stringify(users));
+
+                location.reload();
+            }
+        });
+    });
+
     // Display expenses
     function displayExpenses() {
         const monthKey = `${currentYear}-${currentMonth}`;
-        const monthExpenses = expenses[monthKey] || [];
+        const monthData = expenses[monthKey] || { expenses: [] };
+        const monthExpenses = monthData.expenses; // Access expenses array
         monthExpenses.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort expenses by date, latest first
 
         expenseList.empty();
-        let total = 0;
+        let totalOut = 0;
         let categoryTotals = {};
+
+        // Reset Money In and Balance
+        $('#moneyIn').text('RM 0.00');
+        $('#balance').text('RM 0.00');
+        $('#balance').css('color', '#17a2b8'); // Reset color
+        $('.balance').css('color', '#17a2b8'); // Positive balance
+
 
         if (monthExpenses.length === 0) {
             totalAmount.html(`<span>RM 0.00</span>`);
@@ -140,32 +203,47 @@ $(document).ready(function() {
             return;
         }
 
-        monthExpenses.forEach((expense, index) => {
+        monthExpenses.forEach((expense) => {
             if (!categoryTotals[expense.category]) {
                 categoryTotals[expense.category] = 0;
             }
             categoryTotals[expense.category] += parseFloat(expense.amount);
-            total += parseFloat(expense.amount);
+            totalOut += parseFloat(expense.amount);
             expenseList.append(`
-                <tr>
-                    <td>${expense.date}</td>
-                    <td>${expense.category}</td>
-                    <td>${expense.amount}</td>
-                    <td>${expense.description}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm edit-btn" data-id="${expense.id}" data-month="${currentMonth}" data-year="${currentYear}">Edit</button>
-                    </td>
-                </tr>
-            `);
+            <tr>
+                <td>${expense.date}</td>
+                <td>${expense.category}</td>
+                <td>${expense.amount}</td>
+                <td>${expense.description}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm edit-btn" data-id="${expense.id}" data-month="${currentMonth}" data-year="${currentYear}">Edit</button>
+                </td>
+            </tr>
+        `);
         });
 
-        totalAmount.html(`<span>RM ${total.toFixed(2)}</span>`);  // Update to use HTML with span
+        totalAmount.html(`<span>RM ${totalOut.toFixed(2)}</span>`);
+
+        const income = monthData.income || 0; // Load income value
+        $('#moneyIn').text(`RM ${income.toFixed(2)}`);
+
+        const balance = income - totalOut;
+        $('#balance').text(`RM ${balance.toFixed(2)}`);
+
+        // Change balance text color based on value
+        if (balance < 0) {
+            $('#balance').css('color', 'red');
+            $('.balance').css('color', 'red'); // Negative balance
+        } else {
+            $('#balance').css('color', '#17a2b8');
+            $('.balance').css('color', '#17a2b8');
+        }
 
         populateCategoriesWithAmounts(categoryTotals);
-        displayChartFromCategoryList(categoryTotals, total);
+        displayChartFromCategoryList(categoryTotals, totalOut);
     }
 
-    // Function to hide the pie chart
+
     function hideChart() {
         if (myChart) {
             myChart.destroy();
@@ -173,14 +251,10 @@ $(document).ready(function() {
         }
     }
 
-    // Function to display the pie chart using data from the category list
     function displayChartFromCategoryList(categoryTotals, total) {
         const labels = Object.keys(categoryTotals);
         const data = Object.values(categoryTotals);
         const backgroundColors = labels.map(label => categories.find(cat => cat.name === label).color);
-
-        // Calculate percentages
-        const percentages = data.map(value => ((value / total) * 100).toFixed(1));
 
         if (labels.length === 0) {
             hideChart();
@@ -200,16 +274,14 @@ $(document).ready(function() {
                     }]
                 },
                 options: {
-                    cutout: '70%', // Make the doughnut thinner
+                    cutout: '70%',
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: function(tooltipItem, chartData) {
+                                label: function (tooltipItem, chartData) {
                                     const totalValue = chartData.datasets[0].data.reduce((a, b) => a + b, 0);
                                     const currentValue = chartData.datasets[0].data[tooltipItem.dataIndex];
                                     const percentage = ((currentValue / totalValue) * 100).toFixed(1);
@@ -219,48 +291,30 @@ $(document).ready(function() {
                         },
                         datalabels: {
                             color: '#fff',
-                            display: (context) => {
-                                return context.dataset.data[context.dataIndex] > 0; // Only display if value is greater than 0
-                            },
-                            formatter: (value, ctx) => {
-                                let percentage = percentages[ctx.dataIndex];
-                                return `${percentage}%`;
-                            },
-                            font: {
-                                weight: 'bold'
-                            },
+                            display: (context) => context.dataset.data[context.dataIndex] > 0,
+                            formatter: (value, ctx) => `${((value / total) * 100).toFixed(1)}%`,
+                            font: { weight: 'bold' },
                             padding: 6
                         }
                     }
                 },
-                plugins: [ChartDataLabels] // Register the datalabels plugin
+                plugins: [ChartDataLabels]
             });
         } else {
             myChart.data.labels = labels;
             myChart.data.datasets[0].data = data;
             myChart.data.datasets[0].backgroundColor = backgroundColors;
-            myChart.options.cutout = '70%'; // Make the doughnut thinner
-            myChart.options.plugins.tooltip.callbacks.label = function(tooltipItem, chartData) {
-                const totalValue = chartData.datasets[0].data.reduce((a, b) => a + b, 0);
-                const currentValue = chartData.datasets[0].data[tooltipItem.dataIndex];
-                const percentage = ((currentValue / totalValue) * 100).toFixed(1);
-                return `${chartData.labels[tooltipItem.dataIndex]}: RM ${currentValue.toFixed(2)} (${percentage}%)`;
-            };
-            myChart.options.plugins.datalabels.formatter = function(value, ctx) {
-                let percentage = percentages[ctx.dataIndex];
-                return `${percentage}%`;
-            };
             myChart.update();
         }
     }
 
     // Add expense button click
-    $('#addExpenseBtn').on('click', function() {
+    $('#addExpenseBtn').on('click', function () {
         window.location.href = 'addExpense.html';
     });
 
     // Edit expense button click
-    expenseList.on('click', '.edit-btn', function() {
+    expenseList.on('click', '.edit-btn', function () {
         const id = $(this).data('id');
         const month = $(this).data('month');
         const year = $(this).data('year');
@@ -271,7 +325,7 @@ $(document).ready(function() {
     });
 
     // Logout functionality
-    $('#logoutBtn').on('click', function() {
+    $('#logoutBtn').on('click', function () {
         isLoggedIn = false;
         localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn));
         window.location.href = 'index.html';

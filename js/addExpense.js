@@ -27,16 +27,19 @@ $(document).ready(function() {
         let isLoggedIn = JSON.parse(localStorage.getItem('isLoggedIn'));
         const username = isLoggedIn.username;
         let user = users.find(u => u.username === username);
+        
+        // If user does not exist, create a new user
         if (!user) {
             user = { username: username, expenses: {} };
             users.push(user);
         }
+
         let expenses = user.expenses || {};
 
         // Generate a unique ID for the expense
         const expense = {
             id: Date.now(), // Using timestamp as a simple unique ID
-            amount,
+            amount: parseFloat(amount), // Ensure amount is stored as a number
             date,
             category,
             description
@@ -46,14 +49,16 @@ $(document).ready(function() {
         const expenseDate = new Date(date);
         const monthKey = `${expenseDate.getFullYear()}-${expenseDate.getMonth()}`;
 
+        // Initialize the month's expenses if it doesn't exist
         if (!expenses[monthKey]) {
-            expenses[monthKey] = [];
+            expenses[monthKey] = { income: 0, expenses: [] }; // Initialize with income and expenses array
         }
 
         // Save the new expense to the appropriate month
-        expenses[monthKey].push(expense);
+        expenses[monthKey].expenses.push(expense); // Add expense to the expenses array
+
         user.expenses = expenses; 
-        localStorage.setItem('users', JSON.stringify(users)); // save updated user information
+        localStorage.setItem('users', JSON.stringify(users)); // Save updated user information
 
         window.location.href = 'app.html';
     });

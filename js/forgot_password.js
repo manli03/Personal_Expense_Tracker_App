@@ -1,3 +1,5 @@
+// forgot_password.js
+
 $(document).ready(function() {
     const forgotPasswordForm = $('#forgot-password-form');
     const messageContainer = $('#message');
