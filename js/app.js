@@ -181,12 +181,25 @@ $(document).ready(function () {
                 users = users.map(u => u.username === username ? user : u);
                 localStorage.setItem('users', JSON.stringify(users));
 
-                location.reload();
+                showSuccessPopup(incomeAmount);
             }
             // Remove the overlay when the modal is closed
             document.body.removeChild(overlay);
         });
     });
+
+    function showSuccessPopup(incomeAmount) {
+        Swal.fire({
+            title: 'Success!',
+            text: 'Your income has been updated to RM ' + incomeAmount,
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#4CAF50'
+        }).then(() => {
+            // reload after user click Ok button
+            location.reload();
+        });
+    }
 
     // Display expenses
     function displayExpenses() {
