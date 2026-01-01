@@ -85,7 +85,7 @@ $(document).ready(function () {
   }
 
   // Populate categories
-  const categories = [
+  const defaultCategories = [
     { name: 'Food', icon: 'fa-utensils', color: '#ff6384' },
     { name: 'Transport', icon: 'fa-bus', color: '#36a2eb' },
     { name: 'Utilities', icon: 'fa-bolt', color: '#ffce56' },
@@ -94,11 +94,30 @@ $(document).ready(function () {
     { name: 'Other Expenses', icon: 'fa-ellipsis-h', color: '#c9cbcf' },
   ];
 
+  // Load categories from localStorage or use defaults
+  let categories =
+    JSON.parse(localStorage.getItem('userCategories')) || defaultCategories;
+
   function populateCategoriesWithAmounts(categoryTotals) {
     categoryListContainer.empty();
-    const sortedCategories = categories.sort(
+    // Separate "Other Expenses" from other categories
+    const otherExpensesCategory = categories.find(
+      (cat) => cat.name === 'Other Expenses'
+    );
+    const otherCategories = categories.filter(
+      (cat) => cat.name !== 'Other Expenses'
+    );
+
+    // Sort other categories by amount (descending)
+    const sortedCategories = otherCategories.sort(
       (a, b) => (categoryTotals[b.name] || 0) - (categoryTotals[a.name] || 0)
     );
+
+    // Add "Other Expenses" at the end if it exists
+    if (otherExpensesCategory) {
+      sortedCategories.push(otherExpensesCategory);
+    }
+
     const budgets = getBudgetsForMonth();
     sortedCategories.forEach((category) => {
       const amount = categoryTotals[category.name] || 0;
@@ -129,7 +148,20 @@ $(document).ready(function () {
 
   function resetCategoriesToZero() {
     categoryListContainer.empty();
-    categories.forEach((category) => {
+    // Separate "Other Expenses" from other categories
+    const otherExpensesCategory = categories.find(
+      (cat) => cat.name === 'Other Expenses'
+    );
+    const otherCategories = categories.filter(
+      (cat) => cat.name !== 'Other Expenses'
+    );
+
+    // Combine categories with "Other Expenses" at the end
+    const orderedCategories = otherCategories.concat(
+      otherExpensesCategory ? [otherExpensesCategory] : []
+    );
+
+    orderedCategories.forEach((category) => {
       const categoryItem = $(`
                 <div class="category-item">
                     <div class="category-icon" style="background-color: ${category.color};">
@@ -205,37 +237,37 @@ $(document).ready(function () {
         if (!value) return 'Please enter an amount!';
         if (value < 0) return 'Amount cannot be negative!';
       },
-      didOpen: function() {
+      didOpen: function () {
         // Get all buttons
         const denyBtn = document.querySelector('.swal2-deny');
         const confirmBtn = document.querySelector('.swal2-confirm');
         const cancelBtn = document.querySelector('.swal2-cancel');
         const buttonContainer = document.querySelector('.swal2-actions');
-        
+
         if (denyBtn && confirmBtn && cancelBtn && buttonContainer) {
           // Clear the container
           buttonContainer.innerHTML = '';
-          
+
           // Set full width style for allocate button
           denyBtn.style.width = '100%';
           denyBtn.style.marginBottom = '10px';
-          
+
           // Set styles for save and cancel buttons
           const bottomButtonsWrapper = document.createElement('div');
           bottomButtonsWrapper.style.display = 'flex';
           bottomButtonsWrapper.style.gap = '10px';
           bottomButtonsWrapper.style.width = '100%';
-          
+
           confirmBtn.style.flex = '1';
           cancelBtn.style.flex = '1';
-          
+
           // Append buttons in new order
           buttonContainer.appendChild(denyBtn);
           bottomButtonsWrapper.appendChild(confirmBtn);
           bottomButtonsWrapper.appendChild(cancelBtn);
           buttonContainer.appendChild(bottomButtonsWrapper);
         }
-      }
+      },
     }).then((result) => {
       if (result.isConfirmed) {
         const incomeAmount = parseFloat(result.value);
@@ -426,6 +458,27 @@ $(document).ready(function () {
   function getBudgetsForMonth() {
     const monthKey = `${currentYear}-${currentMonth}`;
     let budgets = JSON.parse(localStorage.getItem('budgets')) || {};
+
+    // If current month has no budget set, try to use previous month's budget
+    if (!budgets[monthKey] || Object.keys(budgets[monthKey]).length === 0) {
+      let prevMonth = currentMonth - 1;
+      let prevYear = currentYear;
+
+      // Handle month wrap-around
+      if (prevMonth < 0) {
+        prevMonth = 11;
+        prevYear = currentYear - 1;
+      }
+
+      const prevMonthKey = `${prevYear}-${prevMonth}`;
+      if (
+        budgets[prevMonthKey] &&
+        Object.keys(budgets[prevMonthKey]).length > 0
+      ) {
+        return budgets[prevMonthKey];
+      }
+    }
+
     return budgets[monthKey] || {};
   }
 
@@ -512,6 +565,615 @@ $(document).ready(function () {
   }
 
   // Add expense button click
+
+  // Manage categories button click
+  $('#manageCategoriesBtn').on('click', function () {
+    showManageCategoriesDialog();
+  });
+
+  // Show manage categories dialog
+  function showManageCategoriesDialog(editingCategoryIndex = null) {
+    // Comprehensive list of Font Awesome icons (100 icons)
+    const allIcons = [
+      'fa-utensils',
+      'fa-bus',
+      'fa-bolt',
+      'fa-heartbeat',
+      'fa-film',
+      'fa-shopping-bag',
+      'fa-home',
+      'fa-book',
+      'fa-plane',
+      'fa-dumbbell',
+      'fa-gamepad',
+      'fa-music',
+      'fa-camera',
+      'fa-gift',
+      'fa-car',
+      'fa-hospital',
+      'fa-graduation-cap',
+      'fa-briefcase',
+      'fa-utensil-spoon',
+      'fa-beer',
+      'fa-pizza-slice',
+      'fa-apple-alt',
+      'fa-shopping-cart',
+      'fa-hotel',
+      'fa-plane-departure',
+      'fa-train',
+      'fa-paw',
+      'fa-tv',
+      'fa-laptop',
+      'fa-mobile',
+      'fa-headphones',
+      'fa-watch',
+      'fa-bicycle',
+      'fa-motorcycle',
+      'fa-ship',
+      'fa-anchor',
+      'fa-cocktail',
+      'fa-coffee',
+      'fa-tea',
+      'fa-utensil',
+      'fa-birthday-cake',
+      'fa-ice-cream',
+      'fa-candy',
+      'fa-lollipop',
+      'fa-chocolate',
+      'fa-carrot',
+      'fa-egg',
+      'fa-cheese',
+      'fa-drumstick',
+      'fa-shrimp',
+      'fa-leaf',
+      'fa-flower',
+      'fa-rose',
+      'fa-sunflower',
+      'fa-clover',
+      'fa-four-leaf-clover',
+      'fa-tree',
+      'fa-forest',
+      'fa-mountain',
+      'fa-beach',
+      'fa-island',
+      'fa-sun',
+      'fa-moon',
+      'fa-cloud',
+      'fa-cloud-rain',
+      'fa-wind',
+      'fa-snowflake',
+      'fa-water',
+      'fa-fire',
+      'fa-star',
+      'fa-heart',
+      'fa-diamond',
+      'fa-gem',
+      'fa-crown',
+      'fa-trophy',
+      'fa-medal',
+      'fa-ribbon',
+      'fa-money-bill',
+      'fa-dollar-sign',
+      'fa-euro-sign',
+      'fa-pound-sign',
+      'fa-yen-sign',
+      'fa-rupee-sign',
+      'fa-credit-card',
+      'fa-wallet',
+      'fa-piggy-bank',
+      'fa-vault',
+      'fa-safe',
+      'fa-lock',
+      'fa-key',
+      'fa-scissors',
+      'fa-pencil',
+      'fa-pen',
+      'fa-palette',
+      'fa-brush',
+      'fa-ruler',
+      'fa-hammer',
+      'fa-wrench',
+      'fa-screwdriver',
+      'fa-toolbox',
+    ];
+
+    const categoryColors = [
+      '#ff6384',
+      '#36a2eb',
+      '#ffce56',
+      '#4bc0c0',
+      '#9966ff',
+      '#ff9f40',
+      '#34495e',
+      '#e74c3c',
+      '#3498db',
+      '#c9cbcf',
+      '#1abc9c',
+      '#f39c12',
+      '#e67e22',
+      '#95a5a6',
+      '#d35400',
+      '#c0392b',
+      '#8e44ad',
+      '#2980b9',
+      '#27ae60',
+      '#16a085',
+      '#f1c40f',
+      '#e91e63',
+      '#9b59b6',
+      '#f44336',
+    ];
+    const iconsPerPage = 15;
+    let currentIconPage = 0;
+
+    let categoryHTML = '<div class="category-management-form">';
+
+    // Display existing categories
+    categoryHTML += '<h5>Current Categories</h5>';
+    categories.forEach((category, index) => {
+      const isCustom = index >= defaultCategories.length;
+      const isEditing = index === editingCategoryIndex;
+      const highlightStyle = isEditing
+        ? 'background-color: #e8f5e9; border: 2px solid #4CAF50;'
+        : '';
+      categoryHTML += `
+        <div class="category-item-management ${
+          isCustom && !isEditing ? 'cursor-pointer-category' : ''
+        }" data-index="${index}" style="margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; ${highlightStyle} ${
+        isCustom && !isEditing ? 'cursor: pointer;' : ''
+      }">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas ${category.icon}" style="color: ${
+        category.color
+      }; font-size: 20px;"></i>
+            <span style="font-weight: bold;">${category.name}</span>
+          </div>
+          ${
+            isCustom
+              ? `<button type="button" class="delete-category-btn" data-index="${index}" style="background-color: #e74c3c; border: none; color: white; width: 32px; height: 32px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;"><i class="fas fa-trash" style="font-size: 14px;"></i></button>`
+              : ''
+          }
+        </div>
+      `;
+    });
+
+    // Add/Edit category form
+    const isEditing =
+      editingCategoryIndex !== null && editingCategoryIndex !== undefined;
+    const editingCategory = isEditing ? categories[editingCategoryIndex] : null;
+    const formTitle = isEditing
+      ? `Update ${editingCategory.name} Category`
+      : 'Add New Category';
+    const buttonText = isEditing
+      ? `Update ${editingCategory.name}`
+      : 'Add Category';
+
+    categoryHTML += `<hr><h5 style="margin-bottom: 20px;">${formTitle}</h5>`;
+    categoryHTML += `
+      <div class="add-category-form">
+        <div style="margin-bottom: 15px;">
+          <label for="newCategoryName" style="font-weight: 600; display: block; margin-bottom: 6px;">Category Name</label>
+          <input type="text" id="newCategoryName" class="form-control" placeholder="Enter category name" value="${
+            editingCategory ? editingCategory.name : ''
+          }">
+        </div>
+        <div style="margin-bottom: 15px;">
+          <label style="font-weight: 600; display: block; margin-bottom: 6px;">Select Icon</label>
+          <div id="iconPickerContainer" style="display: flex; gap: 8px; flex-wrap: wrap;">
+    `;
+
+    // Display first batch of icons (14 icons + More button = 15 total slots)
+    const startIdx = 0;
+    const endIdx = Math.min(iconsPerPage - 1, allIcons.length); // 14 icons for first page
+    for (let i = startIdx; i < endIdx; i++) {
+      const icon = allIcons[i];
+      const isSelected =
+        editingCategory && editingCategory.icon === icon ? true : false;
+      categoryHTML += `<button type="button" class="icon-picker-btn ${
+        isSelected ? 'icon-selected' : ''
+      }" data-icon="${icon}" style="width: 45px; height: 45px; border: ${
+        isSelected ? '3px solid #4CAF50' : '2px solid #ddd'
+      }; border-radius: 5px; cursor: pointer; background-color: #f9f9f9; font-size: 20px;"><i class="fas ${icon}"></i></button>`;
+    }
+
+    // More icons button with pagination (on 15th icon position)
+    if (allIcons.length > endIdx) {
+      categoryHTML += `<button type="button" id="loadMoreIconsBtn" data-page="0" style="width: 45px; height: 45px; border: 2px solid #ddd; border-radius: 5px; cursor: pointer; background-color: #f9f9f9; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; padding: 4px; text-align: center; word-wrap: break-word; line-height: 1.2;">More</button>`;
+    }
+
+    categoryHTML += `<div id="moreIconsContainer" style="display: none; margin-top: 10px;"></div>`;
+
+    categoryHTML += `
+          </div>
+          <input type="hidden" id="newCategoryIcon" value="${
+            editingCategory ? editingCategory.icon : ''
+          }">
+        </div>
+        <div style="margin-bottom: 15px;">
+          <label style="font-weight: 600; display: block; margin-bottom: 6px;">Color</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; justify-content: center;">
+    `;
+
+    categoryColors.forEach((color) => {
+      const isSelected =
+        editingCategory && editingCategory.color === color ? true : false;
+      categoryHTML += `<button type="button" class="color-picker-btn ${
+        isSelected ? 'color-selected' : ''
+      }" data-color="${color}" style="width: 40px; height: 40px; background-color: ${color}; border: ${
+        isSelected ? '3px solid #000' : '2px solid #ddd'
+      }; border-radius: 5px; cursor: pointer;"></button>`;
+    });
+
+    categoryHTML += `
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+            <label for="customColorInput" style="font-size: 12px; color: #666; margin-bottom: 0;">Custom Color:</label>
+            <input type="color" id="customColorInput" value="${
+              editingCategory ? editingCategory.color : '#3498db'
+            }" style="width: 50px; height: 36px; border: 2px solid #ddd; border-radius: 4px; cursor: pointer; padding: 2px;">
+            <span id="customColorValue" style="font-size: 12px; color: #666; font-family: monospace; font-weight: bold;">${
+              editingCategory ? editingCategory.color : '#3498db'
+            }</span>
+          </div>
+          <input type="hidden" id="newCategoryColor" value="${
+            editingCategory ? editingCategory.color : ''
+          }">
+        </div>
+        ${
+          isEditing
+            ? `<button type="button" id="clearEditBtn" style="margin-top: 10px; padding: 8px 12px; background-color: #999; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel Edit</button>`
+            : ''
+        }
+      </div>
+    </div>
+    `;
+
+    // Show the overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'custom-overlay';
+    document.body.appendChild(overlay);
+
+    Swal.fire({
+      title: 'Manage Categories',
+      html: categoryHTML,
+      width: '500px',
+      showCancelButton: true,
+      confirmButtonText: buttonText,
+      cancelButtonText: 'Done',
+      confirmButtonColor: '#4CAF50',
+      cancelButtonColor: '#6c757d',
+      backdrop: false,
+      didOpen: function () {
+        // Attach event listeners for category item click (to edit)
+        document
+          .querySelectorAll('.category-item-management')
+          .forEach((item) => {
+            const index = parseInt(item.getAttribute('data-index'));
+            const isCustom = index >= defaultCategories.length;
+            if (isCustom && index !== editingCategoryIndex) {
+              item.addEventListener('click', function () {
+                Swal.close();
+                showManageCategoriesDialog(index);
+              });
+            }
+          });
+
+        // Attach event listeners for delete buttons
+        document.querySelectorAll('.delete-category-btn').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const index = this.getAttribute('data-index');
+            const categoryName = categories[index].name;
+
+            Swal.fire({
+              title: 'Delete Category?',
+              text: `Are you sure you want to delete "${categoryName}"? This action cannot be undone.`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Delete',
+              cancelButtonText: 'Cancel',
+              confirmButtonColor: '#e74c3c',
+              cancelButtonColor: '#6c757d',
+              backdrop: false,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                categories.splice(index, 1);
+                localStorage.setItem(
+                  'userCategories',
+                  JSON.stringify(categories)
+                );
+                Swal.close();
+                showManageCategoriesDialog();
+              }
+            });
+          });
+        });
+
+        // Attach event listeners for icon picker
+        document.querySelectorAll('.icon-picker-btn').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            document
+              .querySelectorAll('.icon-picker-btn')
+              .forEach((b) => (b.style.borderColor = '#ddd'));
+            this.style.borderColor = '#4CAF50';
+            this.style.borderWidth = '3px';
+            document.getElementById('newCategoryIcon').value =
+              this.getAttribute('data-icon');
+          });
+        });
+
+        // Attach event listeners for color picker
+        document.querySelectorAll('.color-picker-btn').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            document
+              .querySelectorAll('.color-picker-btn')
+              .forEach((b) => (b.style.borderColor = '#ddd'));
+            this.style.borderColor = '#000';
+            this.style.borderWidth = '3px';
+            document.getElementById('newCategoryColor').value =
+              this.getAttribute('data-color');
+            // Clear custom color selection when preset is clicked
+            const customColorInput =
+              document.getElementById('customColorInput');
+            if (customColorInput) {
+              customColorInput.value = this.getAttribute('data-color');
+            }
+          });
+        });
+
+        // Custom color picker event listener
+        const customColorInput = document.getElementById('customColorInput');
+        if (customColorInput) {
+          customColorInput.addEventListener('change', function (e) {
+            const selectedColor = this.value;
+            document.getElementById('newCategoryColor').value = selectedColor;
+            document.getElementById('customColorValue').textContent =
+              selectedColor;
+            // Deselect all preset color buttons
+            document.querySelectorAll('.color-picker-btn').forEach((b) => {
+              b.style.borderColor = '#ddd';
+              b.style.borderWidth = '2px';
+            });
+          });
+
+          customColorInput.addEventListener('input', function (e) {
+            document.getElementById('customColorValue').textContent =
+              this.value;
+          });
+        }
+
+        // Cancel edit button
+        const clearEditBtn = document.getElementById('clearEditBtn');
+        if (clearEditBtn) {
+          clearEditBtn.addEventListener('click', function () {
+            Swal.close();
+            showManageCategoriesDialog();
+          });
+        }
+
+        // Load more icons button with pagination
+        const loadMoreIconsBtn = document.getElementById('loadMoreIconsBtn');
+        const moreIconsContainer =
+          document.getElementById('moreIconsContainer');
+
+        if (loadMoreIconsBtn) {
+          loadMoreIconsBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const currentPage = parseInt(this.getAttribute('data-page'));
+            const nextPage = currentPage + 1;
+            const startIdx = nextPage * iconsPerPage;
+            const endIdx = Math.min(startIdx + iconsPerPage, allIcons.length);
+
+            let iconsWrapper =
+              '<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;">';
+
+            for (let i = startIdx; i < endIdx; i++) {
+              const icon = allIcons[i];
+              const isSelected =
+                editingCategory && editingCategory.icon === icon ? true : false;
+              iconsWrapper += `<button type="button" class="icon-picker-btn ${
+                isSelected ? 'icon-selected' : ''
+              }" data-icon="${icon}" style="width: 45px; height: 45px; border: ${
+                isSelected ? '3px solid #4CAF50' : '2px solid #ddd'
+              }; border-radius: 5px; cursor: pointer; background-color: #f9f9f9; font-size: 20px;"><i class="fas ${icon}"></i></button>`;
+            }
+            iconsWrapper += '</div>';
+
+            // Add navigation controls
+            let navHTML = `<div style="display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: nowrap; width: 100%;">`;
+            if (nextPage > 0) {
+              navHTML += `<button type="button" class="prevPageBtn" style="padding: 0; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; min-width: 70px; max-width: 70px; width: 70px; height: 36px; white-space: nowrap; font-size: 13px; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0;">Back</button>`;
+            } else {
+              navHTML += `<div style="min-width: 70px; width: 70px; flex-shrink: 0;"></div>`;
+            }
+            navHTML += `<span style="font-size: 12px; color: #666; min-width: 120px; text-align: center; flex-shrink: 0;">Page ${
+              nextPage + 1
+            } of ${Math.ceil(allIcons.length / iconsPerPage)}</span>`;
+            if (endIdx < allIcons.length) {
+              navHTML += `<button type="button" class="nextPageBtn" style="padding: 0; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; min-width: 70px; max-width: 70px; width: 70px; height: 36px; white-space: nowrap; font-size: 13px; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0;">Next</button>`;
+            } else {
+              navHTML += `<div style="min-width: 70px; width: 70px; flex-shrink: 0;"></div>`;
+            }
+            navHTML += `</div>`;
+
+            // Hide first page icons and replace with new page icons
+            const iconPickerContainer = document.getElementById(
+              'iconPickerContainer'
+            );
+            iconPickerContainer.innerHTML = iconsWrapper + navHTML;
+            iconPickerContainer.style.display = 'block';
+            iconPickerContainer.style.flexWrap = 'wrap';
+            iconPickerContainer.style.gap = '8px';
+
+            // Hide the more icons container since we're replacing first page content
+            moreIconsContainer.style.display = 'none';
+            moreIconsContainer.innerHTML = '';
+
+            const navDiv = iconPickerContainer.querySelector('div:last-child');
+            if (navDiv) {
+              navDiv.style.display = 'flex';
+              navDiv.style.width = '100%';
+              navDiv.style.alignItems = 'center';
+              navDiv.style.justifyContent = 'center';
+              navDiv.style.gap = '10px';
+            }
+
+            this.setAttribute('data-page', nextPage);
+
+            // Re-attach event listeners to new icon buttons
+            iconPickerContainer
+              .querySelectorAll('.icon-picker-btn')
+              .forEach((btn) => {
+                btn.addEventListener('click', function (e) {
+                  e.preventDefault();
+                  document
+                    .querySelectorAll('.icon-picker-btn')
+                    .forEach((b) => (b.style.borderColor = '#ddd'));
+                  this.style.borderColor = '#4CAF50';
+                  this.style.borderWidth = '3px';
+                  document.getElementById('newCategoryIcon').value =
+                    this.getAttribute('data-icon');
+                });
+              });
+
+            // Attach pagination button listeners
+            const prevBtn = iconPickerContainer.querySelector('.prevPageBtn');
+            const nextBtn = iconPickerContainer.querySelector('.nextPageBtn');
+
+            if (prevBtn) {
+              prevBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                loadMoreIconsBtn.setAttribute('data-page', nextPage - 2);
+                loadMoreIconsBtn.click();
+              });
+            }
+
+            if (nextBtn) {
+              nextBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                loadMoreIconsBtn.setAttribute('data-page', nextPage);
+                loadMoreIconsBtn.click();
+              });
+            }
+
+            loadMoreIconsBtn.style.display = 'none';
+          });
+        }
+
+        // Scroll to bottom to show form
+        const form = document.querySelector('.category-management-form');
+        if (form) {
+          form.style.maxHeight = '400px';
+          form.style.overflowY = 'auto';
+          setTimeout(() => (form.scrollTop = form.scrollHeight), 100);
+        }
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const newCategoryName = document
+          .getElementById('newCategoryName')
+          .value.trim();
+        const newCategoryIcon =
+          document.getElementById('newCategoryIcon').value;
+        const newCategoryColor =
+          document.getElementById('newCategoryColor').value;
+
+        if (!newCategoryName) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Input',
+            text: 'Please enter a category name.',
+            confirmButtonColor: '#4CAF50',
+          });
+          return showManageCategoriesDialog(editingCategoryIndex);
+        }
+
+        if (!newCategoryIcon) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Input',
+            text: 'Please select an icon.',
+            confirmButtonColor: '#4CAF50',
+          });
+          return showManageCategoriesDialog(editingCategoryIndex);
+        }
+
+        if (!newCategoryColor) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Input',
+            text: 'Please select a color.',
+            confirmButtonColor: '#4CAF50',
+          });
+          return showManageCategoriesDialog(editingCategoryIndex);
+        }
+
+        // Check if category name already exists (excluding the current category if editing)
+        const isDuplicate = categories.some(
+          (cat, idx) =>
+            cat.name.toLowerCase() === newCategoryName.toLowerCase() &&
+            idx !== editingCategoryIndex
+        );
+
+        if (isDuplicate) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Duplicate Category',
+            text: 'A category with this name already exists.',
+            confirmButtonColor: '#4CAF50',
+          });
+          return showManageCategoriesDialog(editingCategoryIndex);
+        }
+
+        if (isEditing) {
+          // Update existing category
+          categories[editingCategoryIndex] = {
+            name: newCategoryName,
+            icon: newCategoryIcon,
+            color: newCategoryColor,
+          };
+
+          localStorage.setItem('userCategories', JSON.stringify(categories));
+
+          Swal.fire({
+            title: 'Success!',
+            text: `Category "${newCategoryName}" has been updated.`,
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#4CAF50',
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          // Add new category
+          categories.push({
+            name: newCategoryName,
+            icon: newCategoryIcon,
+            color: newCategoryColor,
+          });
+
+          localStorage.setItem('userCategories', JSON.stringify(categories));
+
+          Swal.fire({
+            title: 'Success!',
+            text: `Category "${newCategoryName}" has been added.`,
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#4CAF50',
+          }).then(() => {
+            location.reload();
+          });
+        }
+      }
+
+      // Remove the overlay when the modal is closed
+      if (document.body.contains(overlay)) {
+        document.body.removeChild(overlay);
+      }
+    });
+  }
 
   // Edit expense button click
   expenseList.on('click', '.edit-btn', function () {
