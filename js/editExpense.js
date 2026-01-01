@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
   const expenseForm = $('#edit-expense-form');
 
   // Default categories
@@ -63,44 +63,72 @@ $(document).ready(function() {
     const category = $('#edit-category').val();
     const description = $('#edit-description').val();
 
-    const updatedExpense = {
-      id: expense.id, // Retain the same ID
-      amount,
-      date,
-      category,
-      description,
-    };
+    Swal.fire({
+      title: 'Update Expense?',
+      text: 'Are you sure you want to update this expense?',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Update',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#4CAF50',
+      cancelButtonColor: '#6c757d',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedExpense = {
+          id: expense.id, // Retain the same ID
+          amount,
+          date,
+          category,
+          description,
+        };
 
-    // Update the expense in the expenses array
-    const indexToUpdate = monthExpenses.findIndex(
-      (exp) => exp.id === expense.id
-    );
-    if (indexToUpdate !== -1) {
-      monthExpenses[indexToUpdate] = updatedExpense; // Update the specific expense
-      monthData.expenses = monthExpenses; // Update the expenses array in monthData
-      expenses[monthKey] = monthData; // Save updated monthData
-      user.expenses = expenses; // Update user expenses
-      localStorage.setItem('users', JSON.stringify(users)); // Save updated users information
-    }
+        // Update the expense in the expenses array
+        const indexToUpdate = monthExpenses.findIndex(
+          (exp) => exp.id === expense.id
+        );
+        if (indexToUpdate !== -1) {
+          monthExpenses[indexToUpdate] = updatedExpense; // Update the specific expense
+          monthData.expenses = monthExpenses; // Update the expenses array in monthData
+          expenses[monthKey] = monthData; // Save updated monthData
+          user.expenses = expenses; // Update user expenses
+          localStorage.setItem('users', JSON.stringify(users)); // Save updated users information
+        }
 
-    window.location.href = 'app.html';
+        window.location.href = 'app.html';
+      }
+    });
   });
 
   // Delete expense
-  $('#deleteExpenseBtn').on('click', function () {
-    const indexToDelete = monthExpenses.findIndex(
-      (exp) => exp.id === expense.id
-    );
+  $('#deleteExpenseBtn').on('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    Swal.fire({
+      title: 'Delete Expense?',
+      text: 'Are you sure you want to delete this expense? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#e74c3c',
+      cancelButtonColor: '#6c757d',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const indexToDelete = monthExpenses.findIndex(
+          (exp) => exp.id === expense.id
+        );
 
-    if (indexToDelete !== -1) {
-      monthExpenses.splice(indexToDelete, 1); // Delete specific expense for that month
-      monthData.expenses = monthExpenses; // Update the expenses array in monthData
-      expenses[monthKey] = monthData; // Save updated monthData
-      user.expenses = expenses; // Update user expenses
-      localStorage.setItem('users', JSON.stringify(users)); // Save updated users information
-    }
+        if (indexToDelete !== -1) {
+          monthExpenses.splice(indexToDelete, 1); // Delete specific expense for that month
+          monthData.expenses = monthExpenses; // Update the expenses array in monthData
+          expenses[monthKey] = monthData; // Save updated monthData
+          user.expenses = expenses; // Update user expenses
+          localStorage.setItem('users', JSON.stringify(users)); // Save updated users information
+        }
 
-    window.location.href = 'app.html';
+        window.location.href = 'app.html';
+      }
+    });
   });
 
   // Back button click
