@@ -301,3 +301,58 @@ body {
     background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
     z-index: 999; /* Ensure it appears above other content */
 }
+
+/* Budget Allocation Form Styles */
+.budget-allocation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+.budget-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.budget-input-group label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.budget-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95rem;
+}
+
+.budget-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+/* Category with budget status */
+.category-item.over-budget {
+    opacity: 0.8;
+}
+
+.category-item.over-budget .category-amount {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.category-budget {
+    color: #28a745;
+    font-size: 0.65rem;
+    font-weight: 600;
+    display: block;
+    margin-top: 2px;
+}
+
+.category-item.over-budget .category-budget {
+    color: #e74c3c;
+}
