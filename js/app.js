@@ -759,7 +759,7 @@ $(document).ready(function () {
         </div>
         <div style="margin-bottom: 15px;">
           <label style="font-weight: 600; display: block; margin-bottom: 6px;">Select Icon</label>
-          <div id="iconPickerContainer" style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <div id="iconPickerContainer" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
     `;
 
     // Display first batch of icons (14 icons + More button = 15 total slots)
@@ -967,7 +967,7 @@ $(document).ready(function () {
             const endIdx = Math.min(startIdx + iconsPerPage, allIcons.length);
 
             let iconsWrapper =
-              '<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;">';
+              '<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; justify-content: center;">';
 
             for (let i = startIdx; i < endIdx; i++) {
               const icon = allIcons[i];
