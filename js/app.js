@@ -103,23 +103,24 @@ $(document).ready(function () {
     sortedCategories.forEach((category) => {
       const amount = categoryTotals[category.name] || 0;
       const budget = budgets[category.name] || 0;
-      const budgetClass = budget > 0 && amount > budget ? 'over-budget' : '';
+      const isOverBudget = budget > 0 && amount > budget;
+      const budgetClass = isOverBudget ? 'over-budget' : '';
       const categoryItem = $(`
-                <div class="category-item ${budgetClass}">
+                <div class="category-item">
                     <div class="category-icon" style="background-color: ${
                       category.color
                     };">
                         <i class="fas ${category.icon}"></i>
                     </div>
                     <span class="category-name">${category.name}</span>
-                    <span class="category-amount">RM ${amount.toFixed(2)}</span>
                     ${
                       budget > 0
-                        ? `<span class="category-budget">Budget: RM ${budget.toFixed(
+                        ? `<span class="category-budget ${budgetClass}">Budget: RM ${budget.toFixed(
                             2
                           )}</span>`
                         : ''
                     }
+                    <span class="category-amount">RM ${amount.toFixed(2)}</span>
                 </div>
             `);
       categoryListContainer.append(categoryItem);
@@ -193,14 +194,48 @@ $(document).ready(function () {
       inputValue: currentIncome || '', // Set to empty if currentIncome is 0
       inputPlaceholder: currentIncome === 0 ? 'Enter your income' : '', // Placeholder when currentIncome is 0
       showCancelButton: true,
+      showDenyButton: true,
       confirmButtonText: 'Save',
+      denyButtonText: 'Allocate Budget',
       confirmButtonColor: '#4CAF50',
+      denyButtonColor: '#17a2b8',
       cancelButtonColor: '#6c757d',
       backdrop: false, // Disable background dismiss
       inputValidator: (value) => {
         if (!value) return 'Please enter an amount!';
         if (value < 0) return 'Amount cannot be negative!';
       },
+      didOpen: function() {
+        // Get all buttons
+        const denyBtn = document.querySelector('.swal2-deny');
+        const confirmBtn = document.querySelector('.swal2-confirm');
+        const cancelBtn = document.querySelector('.swal2-cancel');
+        const buttonContainer = document.querySelector('.swal2-actions');
+        
+        if (denyBtn && confirmBtn && cancelBtn && buttonContainer) {
+          // Clear the container
+          buttonContainer.innerHTML = '';
+          
+          // Set full width style for allocate button
+          denyBtn.style.width = '100%';
+          denyBtn.style.marginBottom = '10px';
+          
+          // Set styles for save and cancel buttons
+          const bottomButtonsWrapper = document.createElement('div');
+          bottomButtonsWrapper.style.display = 'flex';
+          bottomButtonsWrapper.style.gap = '10px';
+          bottomButtonsWrapper.style.width = '100%';
+          
+          confirmBtn.style.flex = '1';
+          cancelBtn.style.flex = '1';
+          
+          // Append buttons in new order
+          buttonContainer.appendChild(denyBtn);
+          bottomButtonsWrapper.appendChild(confirmBtn);
+          bottomButtonsWrapper.appendChild(cancelBtn);
+          buttonContainer.appendChild(bottomButtonsWrapper);
+        }
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         const incomeAmount = parseFloat(result.value);
@@ -212,9 +247,16 @@ $(document).ready(function () {
         localStorage.setItem('users', JSON.stringify(users));
 
         showSuccessPopup(incomeAmount);
+      } else if (result.isDenied) {
+        // Dismiss overlay and open allocate budget dialog
+        document.body.removeChild(overlay);
+        showAllocateBudgetDialog();
+        return;
       }
       // Remove the overlay when the modal is closed
-      document.body.removeChild(overlay);
+      if (document.body.contains(overlay)) {
+        document.body.removeChild(overlay);
+      }
     });
   });
 
@@ -395,8 +437,8 @@ $(document).ready(function () {
     localStorage.setItem('budgets', JSON.stringify(allBudgets));
   }
 
-  // Allocate budget button click
-  $('#allocateBudgetBtn').on('click', function () {
+  // Show allocate budget dialog
+  function showAllocateBudgetDialog() {
     const currentBudgets = getBudgetsForMonth();
     let budgetHTML = '<div class="budget-allocation-form">';
 
@@ -463,9 +505,11 @@ $(document).ready(function () {
         });
       }
       // Remove the overlay when the modal is closed
-      document.body.removeChild(overlay);
+      if (document.body.contains(overlay)) {
+        document.body.removeChild(overlay);
+      }
     });
-  });
+  }
 
   // Add expense button click
 
