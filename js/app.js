@@ -122,6 +122,7 @@ $(document).ready(function () {
     sortedCategories.forEach((category) => {
       const amount = categoryTotals[category.name] || 0;
       const budget = budgets[category.name] || 0;
+      const remaining = budget - amount;
       const isOverBudget = budget > 0 && amount > budget;
       const budgetClass = isOverBudget ? 'over-budget' : '';
       const categoryItem = $(`
@@ -136,7 +137,7 @@ $(document).ready(function () {
                       budget > 0
                         ? `<span class="category-budget ${budgetClass}">Budget: RM ${budget.toFixed(
                             2
-                          )}</span>`
+                          )}<br><small style="font-size: 0.9em; opacity: 0.85;">Left: RM ${Math.max(remaining, 0).toFixed(2)}</small></span>`
                         : ''
                     }
                     <span class="category-amount">RM ${amount.toFixed(2)}</span>
